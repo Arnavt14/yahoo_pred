@@ -6,24 +6,45 @@ import pandas_datareader as data
 import tensorflow as tf
 from constants import Models
 from sklearn.preprocessing import MinMaxScaler
+from doctest import Example
+import profile
+from re import A
+import numpy as np
+import pandas as pd
+import streamlit as st
 
-
+# from pandas_profiling import ProfileReport
+# from streamlit_pandas_profiling import st_profile_report
 
 
 @st.cache(allow_output_mutation=True)
 def load_model_pred():
   model_v = tf.keras.models.load_model(Models.pred_model)
+
   return model_v
 
 ops_selected = st.sidebar.selectbox(
     "options",
-    ("Home","Fraud Detection","Algorithmic Trading","Prediction",)
+    ("Home","Fraud Detection","Algorithmic Trading","Prediction","Data Analysis")
 )
 
 if ops_selected == "Home":
     st.title("Home Page")
 
-
+# elif ops_selected == "Data Analysis":
+#     uploaded_file = st.file_uploader("Choose a file")
+#     if uploaded_file is not None:
+#         @st.cache
+#         def load_csv():
+#             csv = pd.read_csv(uploaded_file)
+#             return csv
+#         df = load_csv()
+#         pr = ProfileReport(df, explorative=True)
+#         st.header('**Input DF**')
+#         st.write(df)
+#         st.write('---')
+#         st.header('**Profiling report with pandas**')
+#         st_profile_report(pr)
 
 elif ops_selected == "Fraud Detection":
     uploaded_file = st.file_uploader("Choose a file")
@@ -118,7 +139,7 @@ elif ops_selected == "Prediction":
     st.write(df1.head(5))
     st.line_chart(df1)
 
-    modelv=load_model_pred()
+    model_v = load_model_pred()
 
     train = pd.DataFrame(df['Close'][0:int(len(df) * 0.70)])
     test = pd.DataFrame(df['Close'][int(len(df) * 0.70):int(len(df))])
@@ -144,7 +165,7 @@ elif ops_selected == "Prediction":
         x_test.append(input_data[i - 100:i])
         y_test.append(input_data[i, 0])
     x_test, y_test = np.array(x_test), np.array(y_test)
-    y_predicted=modelv.predict(x_test)
+    y_predicted=model_v.predict(x_test)
     st.write(y_predicted.shape)
     scale_factor = 1 / 0.00988704
 
